@@ -49,7 +49,12 @@ jobs:
           path: test-results
           if-no-files-found: error
           retention-days: 15
-
+      - name: Push the new files to github pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: test-results
+          destination_dir: test-results
       - name: Upload Pages artifact
         uses: actions/upload-artifact@v3
         with:
