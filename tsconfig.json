@@ -9,7 +9,7 @@
       "noEmit": true,
       "skipLibCheck": true,
       "paths": {
-        "@test/pw-sox/*": ["../playwright-sox-tests/*"]
+        "@test/pw-sox/*": ["../tests/*"]
       }
     },
     "include": ["**/*.ts", "**/*.json"],
