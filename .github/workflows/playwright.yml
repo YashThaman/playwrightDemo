@@ -1,49 +1,57 @@
 name: Playwright SOX Tests
+
 on:
- pull_request:
-   branches: [main]
- push:
-   branches: [main]
- workflow_dispatch:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
-     contents: read
-     pull-requests: read
-     actions: write
-    
+  contents: read
+  pull-requests: read
+  actions: write
+
 jobs:
- test:
-   timeout-minutes: 30
-   runs-on: [ubuntu-latest]
-   steps:
-   - uses: actions/checkout@v3
-   - uses: actions/setup-node@v3
-     with:
-       node-version: 20.x
-       check-latest: false
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14.x
+          check-latest: false
 
-   - name: Install dependencies
-     run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-   - name: Install Playwright Browsers
-     run: yarn pw:install-browsers:ci
+      - name: Install Playwright Browsers
+        run: yarn pw:install-browsers:ci
 
-   - name: Run Playwright tests
-     run: yarn pw:test:ci:github
-   - uses: actions/upload-artifact@v3
-     if: always()
-     with:
-         name: test-results
-         path: test-results
-         if-no-files-found: error
-         retention-days: 15
-    - name: Setup Pages
-      uses: actions/configure-pages@v2
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v1
-      with:
-       path: test-results
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v1
+      - name: Run Playwright tests
+        run: yarn pw:test:ci:github
 
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results
+          if-no-files-found: error
+          retention-days: 15
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: test-results
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
