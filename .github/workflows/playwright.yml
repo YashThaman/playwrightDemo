@@ -28,9 +28,9 @@ jobs:
           node-version: '20.x'
           check-latest: false
 
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v4
+      # - name: Setup Pages
+      #   id: pages
+      #   uses: actions/configure-pages@v4
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -55,12 +55,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: test-results
           destination_dir: test-results
-      - name: Upload Pages artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: pages
-          path: test-results
+      # - name: Upload Pages artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: pages
+      #     path: test-results
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+      # - name: Deploy to GitHub Pages
+      #   id: deployment
+      #   uses: actions/deploy-pages@v1
