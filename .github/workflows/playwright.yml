@@ -17,7 +17,7 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: false
-  
+
 jobs:
   test:
     timeout-minutes: 20
@@ -31,10 +31,6 @@ jobs:
         with:
           node-version: '20.x'
           check-latest: false
-
-      # - name: Setup Pages
-      #   id: pages
-      #   uses: actions/configure-pages@v4
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -53,18 +49,54 @@ jobs:
           path: test-results
           if-no-files-found: error
           retention-days: 15
-      - name: Push the new files to github pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: test-results
-          destination_dir: test-results
-      # - name: Upload Pages artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: pages
-      #     path: test-results
 
-      # - name: Deploy to GitHub Pages
-      #   id: deployment
-      #   uses: actions/deploy-pages@v1
+  publish_report:
+    name: Publish HTML Report
+    if: "success() || needs.test.result == 'failure'"
+    needs: [test]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      HTML_REPORT_URL_PATH: reports/${{ github.ref_name }}/${{ github.run_id }}/${{ github.run_attempt }}
+    steps:
+      - name: Checkout GitHub Pages Branch
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+
+      - name: Set Git User
+        run: |
+          git config --global user.name "yashThaman"
+          git config --global user.email yash.thaman@gmail.com"
+
+      - name: Download zipped HTML report
+        uses: actions/download-artifact@v2
+        with:
+          name: playwright-report
+          path: ${{ env.HTML_REPORT_URL_PATH }}
+
+      - name: Push HTML Report
+        timeout-minutes: 3
+        run: |
+          git add .
+          git commit -m "workflow: add HTML report for run-id ${{ github.run_id }} (attempt:  ${{ github.run_attempt }})"
+        
+          while true; do
+            git pull --rebase
+            if [ $? -ne 0 ]; then
+              echo "Failed to rebase. Please review manually."
+              exit 1
+            fi
+        
+            git push
+            if [ $? -eq 0 ]; then
+              echo "Successfully pushed HTML report to repo."
+              exit 0
+            fi
+          done
+
+      - name: Output Report URL as Workflow Annotation
+        run: |
+          FULL_HTML_REPORT_URL=https://ysfaran.github.io/playwright-gh-actions-gh-pages/$HTML_REPORT_URL_PATH
+
+          echo "::notice title=📋 Published Playwright Test Report::$FULL_HTML_REPORT_URL"
