@@ -2,6 +2,8 @@ name: Playwright SOX Tests
 on:
  pull_request:
    branches: [main]
+ push:
+   branches: [main]
  workflow_dispatch:
 
 permissions:
@@ -32,7 +34,7 @@ jobs:
      if: always()
      with:
          name: test-results
-         path: packages/playwright-sox-tests/test-results/
+         path: test-results
          if-no-files-found: error
          retention-days: 15
 
