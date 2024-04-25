@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: pages
-          path: test-merge-report-demo/
+          path: test-results
 
       - name: Deploy to GitHub Pages
         id: deployment
